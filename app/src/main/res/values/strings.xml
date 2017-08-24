@@ -5,8 +5,9 @@
     <string name="title_health">Health</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_bluetooth">Bluetooth</string>
-    <string name="title_bluetooth_selector">Bluetooth Devices</string>
+    <string name="title_bluetooth_selector">Paired Bluetooth Devices</string>
     <string name="btn_scan">Scan</string>
+    <string name="toast_no_device">No device found</string>
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
