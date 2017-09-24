@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import com.github.abysmalsb.sportstrackerwithsensorhubnano.R;
 import com.infineon.sen.comm.SensorHub;
 
-public class FunctionsActivity extends AppCompatActivity implements PushUpFragment.OnGoalAchieved {
+public class FunctionsActivity extends AppCompatActivity implements OnCommunicate {
 
     public static final String PREFS_NAME = "FunctionsPreferences";
 
@@ -120,6 +120,11 @@ public class FunctionsActivity extends AppCompatActivity implements PushUpFragme
     @Override
     public void playSuccessAudio() {
         mPlaySuccess.start();
+    }
+
+    @Override
+    public void playAlertAudio() {
+        mPlayAlert.start();
     }
 
     @Override

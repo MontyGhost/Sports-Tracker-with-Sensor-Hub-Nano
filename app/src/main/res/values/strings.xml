@@ -15,7 +15,7 @@
     <string name="start">Start</string>
     <string name="pause">Pause</string>
     <string name="continue_text">Continue</string>
-    <string name="add_goal">Add goal</string>
+    <string name="add_goal">Use goal</string>
     <string name="defaultCounterValue">100</string>
     <string name="weight">Weight:</string>
     <string name="reset">Reset</string>

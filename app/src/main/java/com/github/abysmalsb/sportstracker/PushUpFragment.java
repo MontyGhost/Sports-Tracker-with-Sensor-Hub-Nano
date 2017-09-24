@@ -19,19 +19,11 @@ import android.widget.TextView;
 import com.github.abysmalsb.sportstrackerwithsensorhubnano.R;
 
 public class PushUpFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private final String GOAL_ENABLED = "goalEnabled";
     private final String UPDATE_GOAL = "updateGoal";
 
-    private OnGoalAchieved mActivity;
+    private OnCommunicate mActivity;
 
     private TextView counter;
     private CheckBox hasGoal;
@@ -46,37 +38,6 @@ public class PushUpFragment extends Fragment {
     private boolean mAudioPlayed = false;
     private int mPushUps = 0;
     private int mPushUpGoal;
-
-    public PushUpFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PushUpFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PushUpFragment newInstance(String param1, String param2) {
-        PushUpFragment fragment = new PushUpFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -149,8 +110,8 @@ public class PushUpFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnGoalAchieved) {
-            mActivity = (OnGoalAchieved) context;
+        if (context instanceof OnCommunicate) {
+            mActivity = (OnCommunicate) context;
         }
     }
 
@@ -158,11 +119,6 @@ public class PushUpFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mActivity = null;
-    }
-
-    public interface OnGoalAchieved {
-        void playSuccessAudio();
-        SharedPreferences getSharedPreferences();
     }
 
     public void pressureDataUpdated(double pressure) {
