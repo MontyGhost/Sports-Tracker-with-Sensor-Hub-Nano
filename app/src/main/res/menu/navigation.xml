@@ -2,18 +2,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_running"
-        android:title="@string/title_running" />
-
-    <item
-        android:id="@+id/navigation_dashboard"
+        android:id="@+id/navigation_pushups"
         android:icon="@drawable/ic_pushups"
         android:title="@string/title_pushups" />
 
     <item
-        android:id="@+id/navigation_notifications"
-        android:icon="@drawable/ic_health"
-        android:title="@string/title_health" />
+        android:id="@+id/navigation_steps"
+        android:icon="@drawable/ic_steps"
+        android:title="@string/title_steps" />
+
+    <item
+        android:id="@+id/navigation_sitting"
+        android:icon="@drawable/ic_sitting"
+        android:title="@string/title_sitting" />
+
+    <item
+        android:id="@+id/navigation_help"
+        android:icon="@drawable/ic_help"
+        android:title="@string/title_help" />
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/title_settings" />
+
 
 </menu>

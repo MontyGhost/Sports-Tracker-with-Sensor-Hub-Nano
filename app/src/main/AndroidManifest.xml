@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".BluetoothSelectorActivity"
+            android:name="com.github.abysmalsb.sportstracker.BluetoothSelectorActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,9 +20,9 @@
 
         </activity>
         <activity
-            android:name=".FunctionsActivity"
+            android:name="com.github.abysmalsb.sportstracker.FunctionsActivity"
             android:screenOrientation="portrait"
-            android:parentActivityName=".BluetoothSelectorActivity">
+            android:parentActivityName="com.github.abysmalsb.sportstracker.BluetoothSelectorActivity">
         </activity>
     </application>
 
