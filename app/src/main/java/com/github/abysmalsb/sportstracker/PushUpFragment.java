@@ -1,13 +1,16 @@
 package com.github.abysmalsb.sportstracker;
 
 import android.content.Context;
-import android.net.Uri;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -15,15 +18,6 @@ import android.widget.TextView;
 
 import com.github.abysmalsb.sportstrackerwithsensorhubnano.R;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link PushUpFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link PushUpFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PushUpFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -34,14 +28,24 @@ public class PushUpFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private final String GOAL_ENABLED = "goalEnabled";
+    private final String UPDATE_GOAL = "updateGoal";
+
+    private OnGoalAchieved mActivity;
 
     private TextView counter;
     private CheckBox hasGoal;
     private EditText goalNumber;
+    private Button startStopButton;
+    private Button resetButton;
+    private SharedPreferences prefs;
 
     private PushUpCounter mPushUpCounter;
-    private MeasurementsSmoother filter = new MeasurementsSmoother(8);
+    private MeasurementsSmoother mFilter = new MeasurementsSmoother(8);
+    private boolean mCountingStarted = false;
+    private boolean mAudioPlayed = false;
+    private int mPushUps = 0;
+    private int mPushUpGoal;
 
     public PushUpFragment() {
         // Required empty public constructor
@@ -80,68 +84,106 @@ public class PushUpFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_push_up, container, false);
 
+        prefs = mActivity.getSharedPreferences();
         counter = (TextView) view.findViewById(R.id.pushUpCounter);
         hasGoal = (CheckBox) view.findViewById(R.id.hasGoal);
         goalNumber = (EditText) view.findViewById(R.id.goalNumber);
+        mPushUpGoal = Integer.parseInt(goalNumber.getText().toString());
+        goalNumber.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mPushUpGoal = goalNumber.getText().toString().isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(goalNumber.getText().toString());
+
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(UPDATE_GOAL, mPushUpGoal);
+                editor.commit();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         hasGoal.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    enableGoalNumber(isChecked);
+                    goalNumber.setEnabled(isChecked);
+
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putBoolean(GOAL_ENABLED, isChecked);
+                    editor.commit();
                 }
             }
         );
-
+        hasGoal.setChecked(prefs.getBoolean(GOAL_ENABLED, false));
+        mPushUpGoal = prefs.getInt(UPDATE_GOAL, 20);
+        goalNumber.setText(mPushUpGoal + "");
         goalNumber.setEnabled(hasGoal.isChecked());
 
+        startStopButton = (Button) view.findViewById(R.id.startStop);
+        startStopButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mCountingStarted = !mCountingStarted;
+                startStopButton.setText(mCountingStarted ? getString(R.string.pause) : getString(R.string.continue_text));
+            }
+        });
+        resetButton = (Button) view.findViewById(R.id.reset);
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if(mPushUpCounter != null){
+                    mPushUpCounter.resetCounter();
+                }
+                startStopButton.setText(getString(R.string.start));
+                mCountingStarted = false;
+                mPushUps = 0;
+                counter.setText(mPushUps + "");
+                counter.setTextColor(Color.WHITE);
+            }
+        });
+
         return view;
-    }
-
-    private void enableGoalNumber(boolean enable){
-        goalNumber.setEnabled(enable);
-
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnGoalAchieved) {
+            mActivity = (OnGoalAchieved) context;
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        mActivity = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    public interface OnGoalAchieved {
+        void playSuccessAudio();
+        SharedPreferences getSharedPreferences();
     }
 
     public void pressureDataUpdated(double pressure) {
-        if(mPushUpCounter == null){
-            mPushUpCounter = new PushUpCounter(pressure);
+        if(mCountingStarted){
+            if(mPushUpCounter == null){
+                mPushUpCounter = new PushUpCounter(pressure);
+            }
+            mPushUps = mPushUpCounter.getCycleCount(pressure);
+            counter.setText(mPushUps + "");
+
+            if(mPushUps >= mPushUpGoal && hasGoal.isChecked()){
+                counter.setTextColor(Color.GREEN);
+                if(!mAudioPlayed){
+                    mActivity.playSuccessAudio();
+                    mAudioPlayed = true;
+                }
+            }
+            else{
+                counter.setTextColor(Color.WHITE);
+                mAudioPlayed = false;
+            }
         }
-        counter.setText(mPushUpCounter.getCycleCount(pressure) + "");
     }
 }

@@ -13,10 +13,12 @@
     <string name="disconnected_from_device">is disconnected</string>
     <string name="connection_error">Connection error</string>
     <string name="start">Start</string>
-    <string name="finish">Finish</string>
+    <string name="pause">Pause</string>
+    <string name="continue_text">Continue</string>
     <string name="add_goal">Add goal</string>
     <string name="defaultCounterValue">100</string>
     <string name="weight">Weight:</string>
+    <string name="reset">Reset</string>
 
     <!-- Strings related to Settings -->
 

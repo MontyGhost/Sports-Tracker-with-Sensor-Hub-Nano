@@ -26,8 +26,6 @@ public class PushUpCounter {
     }
 
     public int getCycleCount(double currentPressure){
-        Log.i("frag", filter.averageIt(currentPressure) + " " + currentPressure + " " + mPushUps + " " + mUpReached + " " + mBottomReached);
-
         double value = filter.averageIt(currentPressure);
 
         if (value > mWindowUpper){

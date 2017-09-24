@@ -1,5 +1,7 @@
 package com.github.abysmalsb.sportstracker;
 
+import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,10 +14,14 @@ import android.view.MenuItem;
 import com.github.abysmalsb.sportstrackerwithsensorhubnano.R;
 import com.infineon.sen.comm.SensorHub;
 
-public class FunctionsActivity extends AppCompatActivity {
+public class FunctionsActivity extends AppCompatActivity implements PushUpFragment.OnGoalAchieved {
 
-    private SensorHub sensorHub;
-    private Fragment fragmentDisplayed;
+    public static final String PREFS_NAME = "FunctionsPreferences";
+
+    private SensorHub mSensorHub;
+    private MediaPlayer mPlaySuccess;
+    private MediaPlayer mPlayAlert;
+    private Fragment mFragmentDisplayed;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -27,24 +33,24 @@ public class FunctionsActivity extends AppCompatActivity {
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             switch (item.getItemId()) {
                 case R.id.navigation_pushups:
-                    fragmentDisplayed = new PushUpFragment();
-                    transaction.replace(R.id.content, fragmentDisplayed).commit();
+                    mFragmentDisplayed = new PushUpFragment();
+                    transaction.replace(R.id.content, mFragmentDisplayed).commit();
                     return true;
                 case R.id.navigation_steps:
-                    fragmentDisplayed = new StepsFragment();
-                    transaction.replace(R.id.content, fragmentDisplayed).commit();
+                    mFragmentDisplayed = new StepsFragment();
+                    transaction.replace(R.id.content, mFragmentDisplayed).commit();
                     return true;
                 case R.id.navigation_sitting:
-                    fragmentDisplayed = new SittingFragment();
-                    transaction.replace(R.id.content, fragmentDisplayed).commit();
+                    mFragmentDisplayed = new SittingFragment();
+                    transaction.replace(R.id.content, mFragmentDisplayed).commit();
                     return true;
                 case R.id.navigation_help:
-                    fragmentDisplayed = new HealthFragment();
-                    transaction.replace(R.id.content, fragmentDisplayed).commit();
+                    mFragmentDisplayed = new HealthFragment();
+                    transaction.replace(R.id.content, mFragmentDisplayed).commit();
                     return true;
                 case R.id.navigation_settings:
-                    fragmentDisplayed = new SettingsFragment();
-                    transaction.replace(R.id.content, fragmentDisplayed).commit();
+                    mFragmentDisplayed = new SettingsFragment();
+                    transaction.replace(R.id.content, mFragmentDisplayed).commit();
                     return true;
             }
             return false;
@@ -63,17 +69,20 @@ public class FunctionsActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         //TODO: ha nincsenek megadva az adatok (súly), akkor a Settings-szel induljon az app?
-        fragmentDisplayed = new PushUpFragment();
-        transaction.replace(R.id.content, fragmentDisplayed).commit();
+        mFragmentDisplayed = new PushUpFragment();
+        transaction.replace(R.id.content, mFragmentDisplayed).commit();
 
         String deviceAddress = getIntent().getStringExtra("deviceAddress");
 
-        sensorHub = new SensorHub(getApplicationContext(), deviceAddress);
+        mSensorHub = new SensorHub(getApplicationContext(), deviceAddress);
 
         SportsTrackerSensorHubListener listener = new SportsTrackerSensorHubListener(getApplicationContext(), getResources(), this);
 
-        sensorHub.addSensorHubListener(listener);
-        sensorHub.connect();
+        mSensorHub.addSensorHubListener(listener);
+        mSensorHub.connect();
+
+        mPlaySuccess = MediaPlayer.create(this, R.raw.success);
+        mPlayAlert = MediaPlayer.create(this, R.raw.alert);
     }
 
     @Override
@@ -94,17 +103,27 @@ public class FunctionsActivity extends AppCompatActivity {
     }
 
     private void leave(){
-        sensorHub.disconnect();
+        mSensorHub.disconnect();
         finish();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
     public void pressureDataUpdated(double value){
-        if(fragmentDisplayed == null)
+        if(mFragmentDisplayed == null)
             return;
 
-        if(fragmentDisplayed instanceof PushUpFragment){
-            ((PushUpFragment) fragmentDisplayed).pressureDataUpdated(value);
+        if(mFragmentDisplayed instanceof PushUpFragment){
+            ((PushUpFragment) mFragmentDisplayed).pressureDataUpdated(value);
         }
+    }
+
+    @Override
+    public void playSuccessAudio() {
+        mPlaySuccess.start();
+    }
+
+    @Override
+    public SharedPreferences getSharedPreferences() {
+        return getSharedPreferences(PREFS_NAME, 0);
     }
 }
