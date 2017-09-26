@@ -1,14 +1,12 @@
 package com.github.abysmalsb.sportstracker;
 
-import android.util.Log;
-
 /**
  * Created by Balazs Simon on 2017. 09. 24..
  */
 
-public class PushUpCounter {
+public class HealthTrackerCounter {
 
-    private final double WINDOW_SIZE = 0.02;    //it is equal with about 20cm vertical movement. It is perfect for push ups, sit ups
+    private final double mWindowsSize;    //it is equal with about 20cm vertical movement. It is perfect for push ups, sit ups
     private double mWindowUpper;
     private double mWindowLower;
     private int mPushUps;
@@ -16,9 +14,10 @@ public class PushUpCounter {
     private boolean mBottomReached;
     private MeasurementsSmoother filter;
 
-    public PushUpCounter(double initialPressure){
-        mWindowLower = initialPressure - WINDOW_SIZE / 2;
-        mWindowUpper = initialPressure + WINDOW_SIZE / 2;
+    public HealthTrackerCounter(double initialPressure, double windowsSize){
+        mWindowsSize = windowsSize;
+        mWindowLower = initialPressure - mWindowsSize / 2;
+        mWindowUpper = initialPressure + mWindowsSize / 2;
         mPushUps = 0;
         mUpReached = false;
         mBottomReached = false;
@@ -30,13 +29,13 @@ public class PushUpCounter {
 
         if (value > mWindowUpper){
             mWindowUpper = value;
-            mWindowLower = value - WINDOW_SIZE;
-            mUpReached = true;
-        } else if (value < mWindowLower){
-            mWindowLower = value;
-            mWindowUpper = value + WINDOW_SIZE;
+            mWindowLower = value - mWindowsSize;
             if(mUpReached)
                 mBottomReached = true;
+        } else if (value < mWindowLower){
+            mWindowLower = value;
+            mWindowUpper = value + mWindowsSize;
+            mUpReached = true;
         }
 
         if (mUpReached && mBottomReached){

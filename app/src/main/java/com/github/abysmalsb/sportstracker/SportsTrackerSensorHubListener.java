@@ -36,6 +36,8 @@ public class SportsTrackerSensorHubListener implements SensorHubListener {
         sensorHub.setMode("mode", "bg");
         sensorHub.setMode("prs_mr", "16");
         sensorHub.setMode("prs_osr", "32");
+        sensorHub.setMode("temp_mr", "4");
+        sensorHub.setMode("temp_osr", "16");
 
         sensorHub.start();
     }
@@ -53,8 +55,8 @@ public class SportsTrackerSensorHubListener implements SensorHubListener {
 
     @Override
     public void onSensorDataReceived(SensorHub sensorHub, SensorEvent sensorEvent) {
-        if(sensorEvent.getDataId().equals("p") && activity != null){
-            activity.pressureDataUpdated(sensorEvent.getSensorValue());
+        if(sensorEvent.getDataId().equals("a") && activity != null){
+            activity.altitudeDataUpdated(sensorEvent.getSensorValue());
         }
     }
 

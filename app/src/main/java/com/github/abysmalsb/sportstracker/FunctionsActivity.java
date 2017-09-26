@@ -108,12 +108,12 @@ public class FunctionsActivity extends AppCompatActivity implements OnCommunicat
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
-    public void pressureDataUpdated(double value){
+    public void altitudeDataUpdated(double value){
         if(mFragmentDisplayed == null)
             return;
 
         if(mFragmentDisplayed instanceof PushUpFragment){
-            ((PushUpFragment) mFragmentDisplayed).pressureDataUpdated(value);
+            ((PushUpFragment) mFragmentDisplayed).altitudeDataUpdated(value);
         }
     }
 

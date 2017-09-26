@@ -23,7 +23,7 @@ public class PushUpFragment extends Fragment {
     private final String GOAL_ENABLED = "goalEnabled";
     private final String UPDATE_GOAL = "updateGoal";
 
-    private OnCommunicate mActivity;
+    private OnCommunicate mCommunicate;
 
     private TextView counter;
     private CheckBox hasGoal;
@@ -32,8 +32,8 @@ public class PushUpFragment extends Fragment {
     private Button resetButton;
     private SharedPreferences prefs;
 
-    private PushUpCounter mPushUpCounter;
-    private MeasurementsSmoother mFilter = new MeasurementsSmoother(8);
+    private HealthTrackerCounter mPushUpCounter;
+    //private MeasurementsSmoother mFilter = new MeasurementsSmoother(8);
     private boolean mCountingStarted = false;
     private boolean mAudioPlayed = false;
     private int mPushUps = 0;
@@ -45,7 +45,7 @@ public class PushUpFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_push_up, container, false);
 
-        prefs = mActivity.getSharedPreferences();
+        prefs = mCommunicate.getSharedPreferences();
         counter = (TextView) view.findViewById(R.id.pushUpCounter);
         hasGoal = (CheckBox) view.findViewById(R.id.hasGoal);
         goalNumber = (EditText) view.findViewById(R.id.goalNumber);
@@ -111,28 +111,28 @@ public class PushUpFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnCommunicate) {
-            mActivity = (OnCommunicate) context;
+            mCommunicate = (OnCommunicate) context;
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mActivity = null;
+        mCommunicate = null;
     }
 
-    public void pressureDataUpdated(double pressure) {
+    public void altitudeDataUpdated(double altitude) {
         if(mCountingStarted){
             if(mPushUpCounter == null){
-                mPushUpCounter = new PushUpCounter(pressure);
+                mPushUpCounter = new HealthTrackerCounter(altitude, 0.2);
             }
-            mPushUps = mPushUpCounter.getCycleCount(pressure);
+            mPushUps = mPushUpCounter.getCycleCount(altitude);
             counter.setText(mPushUps + "");
 
             if(mPushUps >= mPushUpGoal && hasGoal.isChecked()){
                 counter.setTextColor(Color.GREEN);
                 if(!mAudioPlayed){
-                    mActivity.playSuccessAudio();
+                    mCommunicate.playSuccessAudio();
                     mAudioPlayed = true;
                 }
             }

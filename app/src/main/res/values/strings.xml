@@ -13,12 +13,18 @@
     <string name="disconnected_from_device">is disconnected</string>
     <string name="connection_error">Connection error</string>
     <string name="start">Start</string>
+    <string name="stop">Stop</string>
     <string name="pause">Pause</string>
     <string name="continue_text">Continue</string>
     <string name="add_goal">Use goal</string>
     <string name="defaultCounterValue">100</string>
-    <string name="weight">Weight:</string>
+    <string name="weight">Weight</string>
     <string name="reset">Reset</string>
+    <string name="sitting_minutes">Minutes for sitting:</string>
+    <string name="status">Status:</string>
+    <string name="time_remaining">Time remaining:</string>
+    <string name="sitting">sitting</string>
+    <string name="standing">standing</string>
 
     <!-- Strings related to Settings -->
 
