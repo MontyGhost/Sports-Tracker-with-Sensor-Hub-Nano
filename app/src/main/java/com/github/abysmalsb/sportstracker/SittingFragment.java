@@ -20,21 +20,24 @@ public class SittingFragment extends Fragment {
 
     private final int DEFAULT_MINUTES = 20;
     private final int REPEAT_IN_MINUTES = 300000; //five minutes in millis
+    private final double ALTITUDE_DIFFERENCE = 0.3; //0.3 meter height difference when the user stands up
     private final String MINUTES = "minutes";
 
     private OnCommunicate mCommunicate;
 
-    private HealthTrackerCounter mStandUpCounter;
-
     private EditText sittingMinutes;
     private Button startStop;
+    private TextView status;
     private TextView timerIndicator;
     private SharedPreferences prefs;
     private CountDownTimer variableTimer;
     private CountDownTimer fixTimer;
 
     private int mMinutesForSitting;
-    private boolean started;
+    private double mThreshold;
+    private boolean isThresholdInitialized;
+    private boolean isStarted;
+    private boolean isCountingDown;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,7 +47,9 @@ public class SittingFragment extends Fragment {
 
         prefs = mCommunicate.getSharedPreferences();
 
-        timerIndicator = (TextView)view.findViewById(R.id.time_remaining);
+        status = (TextView) view.findViewById(R.id.statusText);
+
+        timerIndicator = (TextView) view.findViewById(R.id.time_remaining);
         timerIndicator.setText(mMinutesForSitting + ":00");
 
         fixTimer = new CountDownTimer(REPEAT_IN_MINUTES, 1000) {
@@ -58,16 +63,18 @@ public class SittingFragment extends Fragment {
             public void onFinish() {
                 mCommunicate.playAlertAudio();
                 fixTimer.start();
+                isCountingDown = true;
             }
         };
 
-        started = false;
+        isStarted = false;
         startStop = (Button) view.findViewById(R.id.startSitting);
         startStop.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                started = !started;
-                if(started){
+                isStarted = !isStarted;
+                if (isStarted) {
                     startStop.setText(getString(R.string.stop));
+                    isThresholdInitialized = false;
                     variableTimer = new CountDownTimer(mMinutesForSitting * 60 * 1000, 1000) {
 
                         public void onTick(long millisUntilFinished) {
@@ -79,16 +86,17 @@ public class SittingFragment extends Fragment {
                         public void onFinish() {
                             mCommunicate.playAlertAudio();
                             fixTimer.start();
+                            isCountingDown = true;
                         }
                     }.start();
-
-                }
-                else{
+                    isCountingDown = true;
+                } else {
                     timerIndicator.setText(mMinutesForSitting + ":00");
                     startStop.setText(getString(R.string.start));
-                    if(variableTimer != null) {
+                    if (variableTimer != null) {
                         variableTimer.cancel();
                         fixTimer.cancel();
+                        isCountingDown = false;
                     }
                 }
             }
@@ -97,7 +105,8 @@ public class SittingFragment extends Fragment {
         sittingMinutes = (EditText) view.findViewById(R.id.sitting_minutes_input);
         sittingMinutes.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -110,16 +119,19 @@ public class SittingFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
         mMinutesForSitting = prefs.getInt(MINUTES, DEFAULT_MINUTES);
         sittingMinutes.setText(mMinutesForSitting + "");
 
+        isThresholdInitialized = false;
+        isCountingDown = false;
 
         return view;
     }
 
-    private long milliToSec(long millisec){
+    private long milliToSec(long millisec) {
         return millisec / 1000;
     }
 
@@ -135,5 +147,27 @@ public class SittingFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mCommunicate = null;
+    }
+
+    public void altitudeDataUpdated(double altitude) {
+
+        if (isStarted && variableTimer != null && fixTimer != null ) {
+            if (!isThresholdInitialized) {
+                isThresholdInitialized = true;
+                mThreshold = altitude;
+                return;
+            }
+            if (mThreshold + ALTITUDE_DIFFERENCE <= altitude && isCountingDown) {
+                status.setText(getString(R.string.standing));
+                timerIndicator.setText(mMinutesForSitting + ":00");
+                variableTimer.cancel();
+                fixTimer.cancel();
+                isCountingDown = false;
+            } else if(mThreshold + ALTITUDE_DIFFERENCE > altitude && !isCountingDown) {
+                status.setText(getString(R.string.sitting));
+                variableTimer.start();
+                isCountingDown = true;
+            }
+        }
     }
 }

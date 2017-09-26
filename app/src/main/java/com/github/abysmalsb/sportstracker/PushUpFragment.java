@@ -33,7 +33,6 @@ public class PushUpFragment extends Fragment {
     private SharedPreferences prefs;
 
     private HealthTrackerCounter mPushUpCounter;
-    //private MeasurementsSmoother mFilter = new MeasurementsSmoother(8);
     private boolean mCountingStarted = false;
     private boolean mAudioPlayed = false;
     private int mPushUps = 0;

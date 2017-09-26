@@ -115,6 +115,9 @@ public class FunctionsActivity extends AppCompatActivity implements OnCommunicat
         if(mFragmentDisplayed instanceof PushUpFragment){
             ((PushUpFragment) mFragmentDisplayed).altitudeDataUpdated(value);
         }
+        else if(mFragmentDisplayed instanceof SittingFragment){
+            ((SittingFragment) mFragmentDisplayed).altitudeDataUpdated(value);
+        }
     }
 
     @Override
