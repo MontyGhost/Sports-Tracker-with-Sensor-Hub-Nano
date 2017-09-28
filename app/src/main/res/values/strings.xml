@@ -33,6 +33,8 @@
     <string name="upper_limit">Upper limit in cm</string>
     <string name="lower_limit">Lower limit in cm</string>
     <string name="i_fell_message">I fell, please help!</string>
+    <string name="emergency_message_sent">Emergency message sent</string>
+    <string name="error_sms">Error during sending the emergency sms</string>
 
     <!-- Strings related to Settings -->
 

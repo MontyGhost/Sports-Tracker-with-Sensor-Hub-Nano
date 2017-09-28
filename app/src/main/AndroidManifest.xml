@@ -3,6 +3,7 @@
     package="com.github.abysmalsb.sportstrackerwithsensorhubnano">
 
     <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.SEND_SMS" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
