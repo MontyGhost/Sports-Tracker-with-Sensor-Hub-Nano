@@ -22,7 +22,6 @@ import com.github.abysmalsb.sportstrackerwithsensorhubnano.R;
 
 public class HealthFragment extends Fragment implements SensorUpdate {
 
-    private final String HEIGHT = "height";
     private final String PHONE_NUMBER = "phoneNumber";
     private final String MESSAGE = "message";
     private final String UPPER_LIMIT = "upperLimit";
@@ -35,12 +34,10 @@ public class HealthFragment extends Fragment implements SensorUpdate {
     private OnCommunicate mCommunicate;
     private SharedPreferences prefs;
 
-    private TextView textHeight;
     private TextView textPhoneNumber;
     private TextView textMessage;
     private TextView textUpperLimit;
     private TextView textLowerLimit;
-    private EditText personHeight;
     private EditText phoneNumber;
     private EditText message;
     private EditText upperLimit;
@@ -71,7 +68,6 @@ public class HealthFragment extends Fragment implements SensorUpdate {
         View view = inflater.inflate(R.layout.fragment_health, container, false);
         prefs = mCommunicate.getSharedPreferences();
 
-        textHeight = (TextView) view.findViewById(R.id.person_height);
         textPhoneNumber = (TextView) view.findViewById(R.id.phone_number);
         textMessage = (TextView) view.findViewById(R.id.message);
         textUpperLimit = (TextView) view.findViewById(R.id.upper_limit);
@@ -83,27 +79,6 @@ public class HealthFragment extends Fragment implements SensorUpdate {
                 updateStarted(!mStarted);
             }
         });
-
-        personHeight = (EditText) view.findViewById(R.id.height_input);
-        personHeight.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mHeight = personHeight.getText().toString().isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(personHeight.getText().toString());
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putInt(HEIGHT, mHeight);
-                editor.commit();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-        mHeight = prefs.getInt(HEIGHT, 0);
-        personHeight.setText(mHeight + "");
 
         phoneNumber = (EditText) view.findViewById(R.id.phone_number_input);
         phoneNumber.addTextChangedListener(new TextWatcher() {
@@ -242,10 +217,8 @@ public class HealthFragment extends Fragment implements SensorUpdate {
     }
 
     private void enableFallDetectionAttributes(boolean enable) {
-        personHeight.setEnabled(enable);
         phoneNumber.setEnabled(enable);
         message.setEnabled(enable);
-        textHeight.setEnabled(enable);
         textPhoneNumber.setEnabled(enable);
         textMessage.setEnabled(enable);
     }
