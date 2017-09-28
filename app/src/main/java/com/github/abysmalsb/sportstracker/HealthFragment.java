@@ -55,6 +55,7 @@ public class HealthFragment extends Fragment implements SensorUpdate {
 
     private double mStartingPoint;
     private boolean isStartingPointInitialized;
+    private MeasurementsSmoother smoother;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -215,6 +216,8 @@ public class HealthFragment extends Fragment implements SensorUpdate {
         altitudeLock.setChecked(prefs.getBoolean(ALTITUDE_LOCK, false));
         enableAltitudeLockAttributes(altitudeLock.isChecked());
 
+        smoother = new MeasurementsSmoother(10);
+
         updateStarted(false);
 
         return view;
@@ -260,6 +263,8 @@ public class HealthFragment extends Fragment implements SensorUpdate {
 
     @Override
     public void altitudeDataUpdated(double altitude) {
+        double value = smoother.averageIt(altitude);
+
         if (mStarted) {
             if (fallDetection.isChecked()) {
 
@@ -267,9 +272,9 @@ public class HealthFragment extends Fragment implements SensorUpdate {
             if (altitudeLock.isChecked()) {
                 if (!isStartingPointInitialized) {
                     isStartingPointInitialized = true;
-                    mStartingPoint = altitude;
+                    mStartingPoint = value;
                 }
-                if (altitude - mStartingPoint > mUpperLimit / 100.0 || mStartingPoint - altitude > mLowerLimit / 100.0) {
+                if (value - mStartingPoint > mUpperLimit / 100.0 || mStartingPoint - value > mLowerLimit / 100.0) {
                     mCommunicate.playAlertAudio();
                 }
             }
