@@ -25,6 +25,14 @@
     <string name="time_remaining">Time remaining:</string>
     <string name="sitting">sitting</string>
     <string name="standing">standing</string>
+    <string name="height">Person\'s height in cm</string>
+    <string name="enable_fall_detection">Enable fall detection</string>
+    <string name="use_altitude_lock">Use altitude lock</string>
+    <string name="emergency_contact_number">Emergency phone number</string>
+    <string name="emergency_message">Emergency message</string>
+    <string name="upper_limit">Upper limit in cm</string>
+    <string name="lower_limit">Lower limit in cm</string>
+    <string name="i_fell_message">I fell, please help!</string>
 
     <!-- Strings related to Settings -->
 

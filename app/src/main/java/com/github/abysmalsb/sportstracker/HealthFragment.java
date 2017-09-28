@@ -1,107 +1,278 @@
 package com.github.abysmalsb.sportstracker;
 
 import android.content.Context;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.github.abysmalsb.sportstrackerwithsensorhubnano.R;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link HealthFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link HealthFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class HealthFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class HealthFragment extends Fragment implements SensorUpdate {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private final String HEIGHT = "height";
+    private final String PHONE_NUMBER = "phoneNumber";
+    private final String MESSAGE = "message";
+    private final String UPPER_LIMIT = "upperLimit";
+    private final String LOWER_LIMIT = "lowerLimit";
+    private final String FALL_DETECTION = "fallDetection";
+    private final String ALTITUDE_LOCK = "altitudeLock";
 
-    private OnFragmentInteractionListener mListener;
+    private OnCommunicate mCommunicate;
+    private SharedPreferences prefs;
 
-    public HealthFragment() {
-        // Required empty public constructor
-    }
+    private TextView textHeight;
+    private TextView textPhoneNumber;
+    private TextView textMessage;
+    private TextView textUpperLimit;
+    private TextView textLowerLimit;
+    private EditText personHeight;
+    private EditText phoneNumber;
+    private EditText message;
+    private EditText upperLimit;
+    private EditText lowerLimit;
+    private CheckBox fallDetection;
+    private CheckBox altitudeLock;
+    private Button startStop;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HealthFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HealthFragment newInstance(String param1, String param2) {
-        HealthFragment fragment = new HealthFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private int mHeight;
+    private String mPhoneNumber;
+    private String mMessage;
+    private int mUpperLimit;
+    private int mLowerLimit;
+    private boolean mStarted;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private double mStartingPoint;
+    private boolean isStartingPointInitialized;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_health, container, false);
+        View view = inflater.inflate(R.layout.fragment_health, container, false);
+        prefs = mCommunicate.getSharedPreferences();
+
+        textHeight = (TextView) view.findViewById(R.id.person_height);
+        textPhoneNumber = (TextView) view.findViewById(R.id.phone_number);
+        textMessage = (TextView) view.findViewById(R.id.message);
+        textUpperLimit = (TextView) view.findViewById(R.id.upper_limit);
+        textLowerLimit = (TextView) view.findViewById(R.id.lower_limit);
+
+        startStop = (Button) view.findViewById(R.id.startMonitoring);
+        startStop.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                updateStarted(!mStarted);
+            }
+        });
+
+        personHeight = (EditText) view.findViewById(R.id.height_input);
+        personHeight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mHeight = personHeight.getText().toString().isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(personHeight.getText().toString());
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(HEIGHT, mHeight);
+                editor.commit();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        mHeight = prefs.getInt(HEIGHT, 0);
+        personHeight.setText(mHeight + "");
+
+        phoneNumber = (EditText) view.findViewById(R.id.phone_number_input);
+        phoneNumber.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mPhoneNumber = phoneNumber.getText().toString();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(PHONE_NUMBER, mPhoneNumber);
+                editor.commit();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        mPhoneNumber = prefs.getString(PHONE_NUMBER, "");
+        phoneNumber.setText(mPhoneNumber);
+
+        message = (EditText) view.findViewById(R.id.emergency_message_input);
+        message.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mMessage = message.getText().toString();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(MESSAGE, mMessage);
+                editor.commit();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        mMessage = prefs.getString(MESSAGE, getString(R.string.i_fell_message));
+        message.setText(mMessage);
+
+        upperLimit = (EditText) view.findViewById(R.id.upper_limit_input);
+        upperLimit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mUpperLimit = upperLimit.getText().toString().isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(upperLimit.getText().toString());
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(UPPER_LIMIT, mUpperLimit);
+                editor.commit();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        mUpperLimit = prefs.getInt(UPPER_LIMIT, 0);
+        upperLimit.setText(mUpperLimit + "");
+
+        lowerLimit = (EditText) view.findViewById(R.id.lower_limit_input);
+        lowerLimit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mLowerLimit = lowerLimit.getText().toString().isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(lowerLimit.getText().toString());
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(LOWER_LIMIT, mLowerLimit);
+                editor.commit();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        mLowerLimit = prefs.getInt(LOWER_LIMIT, 0);
+        lowerLimit.setText(mLowerLimit + "");
+
+        fallDetection = (CheckBox) view.findViewById(R.id.fall_detection);
+        fallDetection.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                     @Override
+                                                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                         enableFallDetectionAttributes(isChecked);
+
+                                                         SharedPreferences.Editor editor = prefs.edit();
+                                                         editor.putBoolean(FALL_DETECTION, isChecked);
+                                                         editor.commit();
+
+                                                         updateStarted(false);
+                                                     }
+                                                 }
+        );
+        fallDetection.setChecked(prefs.getBoolean(FALL_DETECTION, false));
+        enableFallDetectionAttributes(fallDetection.isChecked());
+
+        altitudeLock = (CheckBox) view.findViewById(R.id.altitude_lock);
+        altitudeLock.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                                    @Override
+                                                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                        enableAltitudeLockAttributes(isChecked);
+
+                                                        SharedPreferences.Editor editor = prefs.edit();
+                                                        editor.putBoolean(ALTITUDE_LOCK, isChecked);
+                                                        editor.commit();
+
+                                                        updateStarted(false);
+                                                    }
+                                                }
+        );
+        altitudeLock.setChecked(prefs.getBoolean(ALTITUDE_LOCK, false));
+        enableAltitudeLockAttributes(altitudeLock.isChecked());
+
+        updateStarted(false);
+
+        return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    private void updateStarted(boolean started) {
+        mStarted = started;
+        startStop.setText(mStarted ? getString(R.string.stop) : getString(R.string.start));
+        if (mStarted) {
+            isStartingPointInitialized = false;
         }
+    }
+
+    private void enableFallDetectionAttributes(boolean enable) {
+        personHeight.setEnabled(enable);
+        phoneNumber.setEnabled(enable);
+        message.setEnabled(enable);
+        textHeight.setEnabled(enable);
+        textPhoneNumber.setEnabled(enable);
+        textMessage.setEnabled(enable);
+    }
+
+    private void enableAltitudeLockAttributes(boolean enable) {
+        upperLimit.setEnabled(enable);
+        lowerLimit.setEnabled(enable);
+        textUpperLimit.setEnabled(enable);
+        textLowerLimit.setEnabled(enable);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnCommunicate) {
+            mCommunicate = (OnCommunicate) context;
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        mCommunicate = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    @Override
+    public void altitudeDataUpdated(double altitude) {
+        if (mStarted) {
+            if (fallDetection.isChecked()) {
+
+            }
+            if (altitudeLock.isChecked()) {
+                if (!isStartingPointInitialized) {
+                    isStartingPointInitialized = true;
+                    mStartingPoint = altitude;
+                }
+                if (altitude - mStartingPoint > mUpperLimit / 100.0 || mStartingPoint - altitude > mLowerLimit / 100.0) {
+                    mCommunicate.playAlertAudio();
+                }
+            }
+        }
     }
 }

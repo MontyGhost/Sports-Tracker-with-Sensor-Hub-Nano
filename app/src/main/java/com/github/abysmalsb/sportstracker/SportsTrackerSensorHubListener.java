@@ -19,18 +19,20 @@ public class SportsTrackerSensorHubListener implements SensorHubListener {
     private final Context context;
     private final Resources resources;
     private final FunctionsActivity activity;
+    private final String deviceName;
 
-    public SportsTrackerSensorHubListener(Context context, Resources resources, FunctionsActivity activity){
+    public SportsTrackerSensorHubListener(Context context, Resources resources, FunctionsActivity activity, String deviceName){
         if(context == null)
             throw new IllegalArgumentException("null value is prohibited");
         this.context = context;
         this.resources = resources;
         this.activity = activity;
+        this.deviceName = deviceName;
     }
 
     @Override
     public void onConnected(SensorHub sensorHub) {
-        Toast.makeText(context, resources.getString(R.string.connected_to_device) + " " + sensorHub.getName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, resources.getString(R.string.connected_to_device) + " " + deviceName, Toast.LENGTH_SHORT).show();
 
         sensorHub.setSelectedSensor(sensorHub.getSensorList().get(0).getId());
         sensorHub.setMode("mode", "bg");
@@ -44,12 +46,12 @@ public class SportsTrackerSensorHubListener implements SensorHubListener {
 
     @Override
     public void onDisconnected(SensorHub sensorHub) {
-        Toast.makeText(context, sensorHub.getName() + " " + resources.getString(R.string.disconnected_from_device), Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, deviceName + " " + resources.getString(R.string.disconnected_from_device), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onConnectionError(SensorHub sensorHub) {
-        Toast.makeText(context, resources.getString(R.string.connection_error) + " " + sensorHub.getName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, resources.getString(R.string.connection_error) + " " + deviceName, Toast.LENGTH_SHORT).show();
 
     }
 

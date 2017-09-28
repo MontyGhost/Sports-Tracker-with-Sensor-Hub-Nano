@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.github.abysmalsb.sportstrackerwithsensorhubnano.R;
 
-public class SittingFragment extends Fragment {
+public class SittingFragment extends Fragment implements SensorUpdate {
 
     private final int DEFAULT_MINUTES = 20;
     private final int REPEAT_IN_MINUTES = 300000; //five minutes in millis
@@ -34,8 +34,8 @@ public class SittingFragment extends Fragment {
     private CountDownTimer fixTimer;
 
     private int mMinutesForSitting;
-    private double mThreshold;
-    private boolean isThresholdInitialized;
+    private double mStartingPoint;
+    private boolean isStartingPointInitialized;
     private boolean isStarted;
     private boolean isCountingDown;
 
@@ -74,7 +74,7 @@ public class SittingFragment extends Fragment {
                 isStarted = !isStarted;
                 if (isStarted) {
                     startStop.setText(getString(R.string.stop));
-                    isThresholdInitialized = false;
+                    isStartingPointInitialized = false;
                     variableTimer = new CountDownTimer(mMinutesForSitting * 60 * 1000, 1000) {
 
                         public void onTick(long millisUntilFinished) {
@@ -125,7 +125,7 @@ public class SittingFragment extends Fragment {
         mMinutesForSitting = prefs.getInt(MINUTES, DEFAULT_MINUTES);
         sittingMinutes.setText(mMinutesForSitting + "");
 
-        isThresholdInitialized = false;
+        isStartingPointInitialized = false;
         isCountingDown = false;
 
         return view;
@@ -149,21 +149,22 @@ public class SittingFragment extends Fragment {
         mCommunicate = null;
     }
 
+    @Override
     public void altitudeDataUpdated(double altitude) {
 
         if (isStarted && variableTimer != null && fixTimer != null ) {
-            if (!isThresholdInitialized) {
-                isThresholdInitialized = true;
-                mThreshold = altitude;
+            if (!isStartingPointInitialized) {
+                isStartingPointInitialized = true;
+                mStartingPoint = altitude;
                 return;
             }
-            if (mThreshold + ALTITUDE_DIFFERENCE <= altitude && isCountingDown) {
+            if (mStartingPoint + ALTITUDE_DIFFERENCE <= altitude && isCountingDown) {
                 status.setText(getString(R.string.standing));
                 timerIndicator.setText(mMinutesForSitting + ":00");
                 variableTimer.cancel();
                 fixTimer.cancel();
                 isCountingDown = false;
-            } else if(mThreshold + ALTITUDE_DIFFERENCE > altitude && !isCountingDown) {
+            } else if(mStartingPoint + ALTITUDE_DIFFERENCE > altitude && !isCountingDown) {
                 status.setText(getString(R.string.sitting));
                 variableTimer.start();
                 isCountingDown = true;

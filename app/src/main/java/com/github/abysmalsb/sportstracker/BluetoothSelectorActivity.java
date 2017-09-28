@@ -21,6 +21,9 @@ import java.util.Set;
 
 public class BluetoothSelectorActivity extends AppCompatActivity {
 
+    public static final String DEVICE_ADDRESS = "deviceAddress";
+    public static final String DEVICE_NAME = "deviceName";
+
     private ListView btDevices;
     private Button btScan;
     private BluetoothDevice[] devices;
@@ -43,7 +46,7 @@ public class BluetoothSelectorActivity extends AppCompatActivity {
               new AdapterView.OnItemClickListener(){
                   @Override
                   public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                      connect(devices[position].getAddress());
+                      connect(devices[position].getAddress(), devices[position].getName());
                   }
               }
         );
@@ -67,9 +70,10 @@ public class BluetoothSelectorActivity extends AppCompatActivity {
         btDevices.setAdapter(adapter);
     }
 
-    private void connect(String address) {
+    private void connect(String address, String name) {
         Intent intent = new Intent(BluetoothSelectorActivity.this, FunctionsActivity.class);
-        intent.putExtra("deviceAddress", address);
+        intent.putExtra(DEVICE_ADDRESS, address);
+        intent.putExtra(DEVICE_NAME, name);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }

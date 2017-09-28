@@ -48,10 +48,6 @@ public class FunctionsActivity extends AppCompatActivity implements OnCommunicat
                     mFragmentDisplayed = new HealthFragment();
                     transaction.replace(R.id.content, mFragmentDisplayed).commit();
                     return true;
-                case R.id.navigation_settings:
-                    mFragmentDisplayed = new SettingsFragment();
-                    transaction.replace(R.id.content, mFragmentDisplayed).commit();
-                    return true;
             }
             return false;
         }
@@ -68,15 +64,15 @@ public class FunctionsActivity extends AppCompatActivity implements OnCommunicat
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        //TODO: ha nincsenek megadva az adatok (súly), akkor a Settings-szel induljon az app?
         mFragmentDisplayed = new PushUpFragment();
         transaction.replace(R.id.content, mFragmentDisplayed).commit();
 
-        String deviceAddress = getIntent().getStringExtra("deviceAddress");
+        String deviceAddress = getIntent().getStringExtra(BluetoothSelectorActivity.DEVICE_ADDRESS);
+        String deviceName = getIntent().getStringExtra(BluetoothSelectorActivity.DEVICE_NAME);
 
         mSensorHub = new SensorHub(getApplicationContext(), deviceAddress);
 
-        SportsTrackerSensorHubListener listener = new SportsTrackerSensorHubListener(getApplicationContext(), getResources(), this);
+        SportsTrackerSensorHubListener listener = new SportsTrackerSensorHubListener(getApplicationContext(), getResources(), this, deviceName);
 
         mSensorHub.addSensorHubListener(listener);
         mSensorHub.connect();
@@ -112,11 +108,8 @@ public class FunctionsActivity extends AppCompatActivity implements OnCommunicat
         if(mFragmentDisplayed == null)
             return;
 
-        if(mFragmentDisplayed instanceof PushUpFragment){
-            ((PushUpFragment) mFragmentDisplayed).altitudeDataUpdated(value);
-        }
-        else if(mFragmentDisplayed instanceof SittingFragment){
-            ((SittingFragment) mFragmentDisplayed).altitudeDataUpdated(value);
+        if(mFragmentDisplayed instanceof SensorUpdate){
+            ((SensorUpdate) mFragmentDisplayed).altitudeDataUpdated(value);
         }
     }
 

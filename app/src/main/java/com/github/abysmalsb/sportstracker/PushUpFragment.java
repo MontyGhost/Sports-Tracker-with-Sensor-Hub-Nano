@@ -18,7 +18,7 @@ import android.widget.TextView;
 
 import com.github.abysmalsb.sportstrackerwithsensorhubnano.R;
 
-public class PushUpFragment extends Fragment {
+public class PushUpFragment extends Fragment implements SensorUpdate {
 
     private final String GOAL_ENABLED = "goalEnabled";
     private final String UPDATE_GOAL = "updateGoal";
@@ -51,7 +51,8 @@ public class PushUpFragment extends Fragment {
         mPushUpGoal = Integer.parseInt(goalNumber.getText().toString());
         goalNumber.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -63,19 +64,20 @@ public class PushUpFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         hasGoal.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    goalNumber.setEnabled(isChecked);
+                                               @Override
+                                               public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                   goalNumber.setEnabled(isChecked);
 
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean(GOAL_ENABLED, isChecked);
-                    editor.commit();
-                }
-            }
+                                                   SharedPreferences.Editor editor = prefs.edit();
+                                                   editor.putBoolean(GOAL_ENABLED, isChecked);
+                                                   editor.commit();
+                                               }
+                                           }
         );
         hasGoal.setChecked(prefs.getBoolean(GOAL_ENABLED, false));
         mPushUpGoal = prefs.getInt(UPDATE_GOAL, 20);
@@ -92,7 +94,7 @@ public class PushUpFragment extends Fragment {
         resetButton = (Button) view.findViewById(R.id.reset);
         resetButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(mPushUpCounter != null){
+                if (mPushUpCounter != null) {
                     mPushUpCounter.resetCounter();
                 }
                 startStopButton.setText(getString(R.string.start));
@@ -120,22 +122,22 @@ public class PushUpFragment extends Fragment {
         mCommunicate = null;
     }
 
+    @Override
     public void altitudeDataUpdated(double altitude) {
-        if(mCountingStarted){
-            if(mPushUpCounter == null){
+        if (mCountingStarted) {
+            if (mPushUpCounter == null) {
                 mPushUpCounter = new HealthTrackerCounter(altitude, 0.2);
             }
             mPushUps = mPushUpCounter.getCycleCount(altitude);
             counter.setText(mPushUps + "");
 
-            if(mPushUps >= mPushUpGoal && hasGoal.isChecked()){
+            if (mPushUps >= mPushUpGoal && hasGoal.isChecked()) {
                 counter.setTextColor(Color.GREEN);
-                if(!mAudioPlayed){
+                if (!mAudioPlayed) {
                     mCommunicate.playSuccessAudio();
                     mAudioPlayed = true;
                 }
-            }
-            else{
+            } else {
                 counter.setTextColor(Color.WHITE);
                 mAudioPlayed = false;
             }
