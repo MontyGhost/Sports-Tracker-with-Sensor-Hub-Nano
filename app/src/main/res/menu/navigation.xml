@@ -7,9 +7,9 @@
         android:title="@string/title_pushups" />
 
     <item
-        android:id="@+id/navigation_steps"
-        android:icon="@drawable/ic_steps"
-        android:title="@string/title_steps" />
+        android:id="@+id/navigation_arcade"
+        android:icon="@drawable/ic_arcade"
+        android:title="@string/title_arcade" />
 
     <item
         android:id="@+id/navigation_sitting"

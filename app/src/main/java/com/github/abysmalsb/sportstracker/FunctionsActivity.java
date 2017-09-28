@@ -36,8 +36,8 @@ public class FunctionsActivity extends AppCompatActivity implements OnCommunicat
                     mFragmentDisplayed = new PushUpFragment();
                     transaction.replace(R.id.content, mFragmentDisplayed).commit();
                     return true;
-                case R.id.navigation_steps:
-                    mFragmentDisplayed = new StepsFragment();
+                case R.id.navigation_arcade:
+                    mFragmentDisplayed = new ArcadeFragment();
                     transaction.replace(R.id.content, mFragmentDisplayed).commit();
                     return true;
                 case R.id.navigation_sitting:
