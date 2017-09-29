@@ -52,7 +52,6 @@ public class SportsTrackerSensorHubListener implements SensorHubListener {
     @Override
     public void onConnectionError(SensorHub sensorHub) {
         Toast.makeText(context, resources.getString(R.string.connection_error) + " " + deviceName, Toast.LENGTH_SHORT).show();
-
     }
 
     @Override
