@@ -94,9 +94,9 @@ public class ArcadeFragment extends Fragment implements SensorUpdate {
             }
         } else {
             if(!throwingUpdated && Math.abs(target - throwingPeak + initialValue) < Math.abs(target - currentRecord + initialValue)){
-                recordValue.setText(String.format("%.2f", currentRecord - initialValue) + " m");
                 mCommunicate.playSuccessAudio();
                 currentRecord = throwingPeak;
+                recordValue.setText(String.format("%.2f", currentRecord - initialValue) + " m");
             }
             throwingUpdated = true;
             throwingPeak = Integer.MIN_VALUE;
