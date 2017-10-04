@@ -15,6 +15,11 @@ public class MeasurementsSmoother {
         mNextIndex = 0;
     }
 
+    /**
+     * It will smooth the signal by averiging the given value. It will cause some delay for changes to occur
+     * @param measurement
+     * @return
+     */
     public double averageIt(double measurement){
         double sum = 0.0;
 

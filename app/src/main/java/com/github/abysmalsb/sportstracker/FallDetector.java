@@ -30,6 +30,11 @@ public class FallDetector {
         isFallenInAPreviousCycle = false;
     }
 
+    /**
+     * Differentiate the input data and uses it to detect when a fall is occured
+     * @param currentAltitude
+     * @return true if the user fell
+     */
     public boolean isFallen(double currentAltitude){
 
         boolean isFallen = true;

@@ -53,6 +53,10 @@ public class ArcadeFragment extends Fragment implements SensorUpdate {
         return view;
     }
 
+    /**
+     * It will generate a new target
+     * The range of the generated target varies between 0.5 - 2 m from the starting height
+     */
     private void generateNewTarget() {
         throwingUpdated = false;
         initialValueNeedsToBeUpdated = true;
@@ -77,6 +81,11 @@ public class ArcadeFragment extends Fragment implements SensorUpdate {
         mCommunicate = null;
     }
 
+    /**
+     * Record will be updated with the closest thworing peak to the target
+     * A valid throw must end under the 0 m relative height
+     * @param altitude
+     */
     @Override
     public void altitudeDataUpdated(double altitude) {
 
@@ -85,8 +94,6 @@ public class ArcadeFragment extends Fragment implements SensorUpdate {
             initialValue = altitude;
         }
 
-        //-0.1, 1.2, 1.1 t: 1.0
-        Log.i("log", altitude + " " + throwingPeak + " " + currentRecord + " " + initialValue + " " + String.format("%.2f", currentRecord - initialValue)  + " " + (currentRecord - initialValue) + " " + throwingUpdated);
         if (altitude > initialValue) {
             throwingUpdated = false;
             if (altitude > throwingPeak) {

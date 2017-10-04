@@ -122,6 +122,12 @@ public class PushUpFragment extends Fragment implements SensorUpdate {
         mCommunicate = null;
     }
 
+    /**
+     * Counting starts with 0 and you can reset it at any time. The counter will be incremented once you reach the upper threshold of the window.
+     * You can set an optional goal, too. Once you reach the goal, it will notify you with a sound and the counter text will turn to green.
+     * Due to the moving window, it will automatically adapt to any altitude. It can continuously work even if you are moving between floors, but it might cause a false positive event when you move up and down.
+     * @param altitude
+     */
     @Override
     public void altitudeDataUpdated(double altitude) {
         if (mCountingStarted) {

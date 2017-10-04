@@ -19,6 +19,9 @@ import com.github.abysmalsb.sportstrackerwithsensorhubnano.R;
 
 import java.util.Set;
 
+/**
+ * The first activity, used to launch the app. You can connect to paired BT devices here but right now it is combatible only with Infineon SensorHub and SensorHub Nano
+ */
 public class BluetoothSelectorActivity extends AppCompatActivity {
 
     public static final String DEVICE_ADDRESS = "deviceAddress";
@@ -70,6 +73,11 @@ public class BluetoothSelectorActivity extends AppCompatActivity {
         btDevices.setAdapter(adapter);
     }
 
+    /**
+     * Open FunctionsActivity and then try to connect to the device
+     * @param address   MAC address of the selected device
+     * @param name      Name of the selected device
+     */
     private void connect(String address, String name) {
         Intent intent = new Intent(BluetoothSelectorActivity.this, FunctionsActivity.class);
         intent.putExtra(DEVICE_ADDRESS, address);
@@ -78,11 +86,20 @@ public class BluetoothSelectorActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
+    /**
+     * It return with an array of the paired BT devices
+     * @return
+     */
     private BluetoothDevice[] getPairedBTDevices() {
         Set<BluetoothDevice> devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
         return devices.toArray(new BluetoothDevice[devices.size()]);
     }
 
+    /**
+     * It returns true if the device is a known supported device. Right now it means only 2 devices
+     * @param d
+     * @return
+     */
     private boolean isRecognized(BluetoothDevice d) {
         String deviceName = d.getName().toLowerCase();
         return deviceName.equals("ifx_nanohub") || deviceName.equals("ifx_senhub");

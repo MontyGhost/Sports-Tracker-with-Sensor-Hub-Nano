@@ -12,6 +12,7 @@ import com.infineon.sen.comm.SensorHubListener;
 
 /**
  * Created by Balazs Simon on 2017. 09. 11..
+ * Implementation for SensorHubListener
  */
 
 public class SportsTrackerSensorHubListener implements SensorHubListener {

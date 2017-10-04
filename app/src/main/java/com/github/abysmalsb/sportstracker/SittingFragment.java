@@ -149,6 +149,13 @@ public class SittingFragment extends Fragment implements SensorUpdate {
         mCommunicate = null;
     }
 
+    /**
+     * This function uses a fix threshold, updated on start
+     * If you reach the "sitting for minutes" time, then you'll hear an alarm. It won't force you to stand up, but a new countdown, from 5 minutes will be started until you stand up, or click on the stop button.
+     * If you stand up and then sit down, it will start counting down from the given time, not from 5 minutes.
+     * Standing for only a moment is enough to reset the timer
+     * @param altitude
+     */
     @Override
     public void altitudeDataUpdated(double altitude) {
 

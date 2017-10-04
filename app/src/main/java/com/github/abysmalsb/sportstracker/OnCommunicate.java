@@ -8,10 +8,19 @@ import android.content.SharedPreferences;
 
 public interface OnCommunicate {
 
+    /**
+     * This function have to result an audio signal meaning success
+     */
     void playSuccessAudio();
 
+    /**
+     * This function have to result an audio signal meaning alert
+     */
     void playAlertAudio();
 
+    /**
+     * Getter for sharedPreferences
+     */
     SharedPreferences getSharedPreferences();
 
 }

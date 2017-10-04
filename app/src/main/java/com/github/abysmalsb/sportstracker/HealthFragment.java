@@ -244,6 +244,13 @@ public class HealthFragment extends Fragment implements SensorUpdate {
         mCommunicate = null;
     }
 
+    /**
+     * This function based on the differential of the raw signal so altitude change itself won't trigger fall event, unless the change is too fast. If you jump into the bed too fast it might be recognized as falling.
+     * Fall detection and Altitude lock can work in parallel at the same time or you can enable only one of them.
+     * Fall detection and Altitude lock will make the same alarm sound when triggered
+     * If you fall, the app will immediateliy start the alarm sound and it will continue until you stand up. After 15 seconds it will send the emergency SMS to the given phone number. Sending the SMS won't stop the alarm sound. You'll be notified about the SMS using with a Toast message.
+     * @param altitude
+     */
     @Override
     public void altitudeDataUpdated(double altitude) {
         if(smoother != null){
@@ -287,6 +294,9 @@ public class HealthFragment extends Fragment implements SensorUpdate {
         }
     }
 
+    /**
+     * Sending emergency SMS. Take care of permissions!
+     */
     private void sendSMS() {
 
         try {

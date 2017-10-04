@@ -24,6 +24,11 @@ public class HealthTrackerCounter {
         filter = new MeasurementsSmoother(8);
     }
 
+    /**
+     * It counts the up-down cycles that the user makes during workout. It uses a moving windows to prevent multiple counting
+     * @param currentPressure
+     * @return
+     */
     public int getCycleCount(double currentPressure){
         double value = filter.averageIt(currentPressure);
 
