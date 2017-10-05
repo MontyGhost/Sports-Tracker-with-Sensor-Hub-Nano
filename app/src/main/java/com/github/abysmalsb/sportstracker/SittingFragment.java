@@ -20,7 +20,7 @@ public class SittingFragment extends Fragment implements SensorUpdate {
 
     private final int DEFAULT_MINUTES = 20;
     private final int REPEAT_IN_MINUTES = 300000; //five minutes in millis
-    private final double ALTITUDE_DIFFERENCE = 0.3; //0.3 meter height difference when the user stands up
+    private final double ALTITUDE_DIFFERENCE = 0.3; //0.3 meter height difference when the user stands up. It is used as an offset for the threshold
     private final String MINUTES = "minutes";
 
     private OnCommunicate mCommunicate;
@@ -159,12 +159,15 @@ public class SittingFragment extends Fragment implements SensorUpdate {
     @Override
     public void altitudeDataUpdated(double altitude) {
 
+        //This function can run before initializeing the timers so we have to take care of that
         if (isStarted && variableTimer != null && fixTimer != null ) {
+            //We have to initialize a starting point to use as a threshold
             if (!isStartingPointInitialized) {
                 isStartingPointInitialized = true;
                 mStartingPoint = altitude;
                 return;
             }
+            //
             if (mStartingPoint + ALTITUDE_DIFFERENCE <= altitude && isCountingDown) {
                 status.setText(getString(R.string.standing));
                 timerIndicator.setText(mMinutesForSitting + ":00");
